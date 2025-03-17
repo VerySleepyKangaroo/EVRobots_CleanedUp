@@ -32,7 +32,7 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
 # Play a sound to tell us when we are ready to start moving
 ev3.speaker.beep()
-
+counter = 5
 # The following loop makes the robot drive forward until it detects an
 # obstacle. Then it backs up and turns around. It keeps on doing this
 # until you stop the program.
@@ -51,3 +51,10 @@ while True:
 
     # Turn around by 120 degrees
     robot.turn(120)
+    counter -= 1
+    print("obstacle found")
+    print("You have " + str(counter) + " obstacles left")
+    if counter <= 0:
+        print("Obstacle count is 0")
+        quit()
+
