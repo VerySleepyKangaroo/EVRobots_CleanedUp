@@ -1,6 +1,8 @@
 #!/usr/bin/env pybricks-micropython
 import sys
 import time
+import math
+import random
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
@@ -24,11 +26,15 @@ LEFT_KEY = 'a'
 RIGHT_KEY = 'd'
 STOP_KEY = 'q'
 
-obstacle_sensor = UltrasonicSensor(Port.S2)  # Ultrasonic sensor
-color_sensor = ColorSensor(Port.S4)  # Color sensor
-touch_sensor = TouchSensor(Port.S3)  # Touch sensor
+turn = 1
+
+obstacle_sensor = UltrasonicSensor(Port.S4)  # Ultrasonic sensor
+color_sensor = ColorSensor(Port.S3)  # Color sensor
+touch_sensor = TouchSensor(Port.S1)  # Touch sensor
 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=118)
+
+print("Click Q to make it Autonomous")
 
 # Write your program here.
 ev3.speaker.beep()
@@ -49,6 +55,25 @@ def checkforobstacles():
         ev3.screen.print("No Obstacles Detected")
         wait(500)
         ev3.screen.clear()
+
+def autonomous():
+    print("Autonomous session is active")
+    while True:
+        ev3.screen.clear()
+        ev3.screen.print("Autonomous")
+        robot.drive_time(100, 0, 1000)
+        if obstacle_sensor.distance() < 150:
+            turn = random.randint(1, 2)
+            print(color = color_sensor.color)
+            if turn == 1:
+                robot.turn(100)
+                robot.drive_time(250, 0, 2000)
+                robot.turn(100)
+            if turn == 2:
+                robot.turn(-100)
+                robot.drive_time(250, 0, 2000)
+                robot.turn(-100)
+
 
 while True:
     char = sys.stdin.read(1)
@@ -76,8 +101,14 @@ while True:
         ev3.screen.clear()
         robot.stop()
         checkforobstacles()
+    elif char == STOP_KEY:
+        robot.stop()
+        ev3.screen.print("Loading . . .")
+        print("Loading . . .")
+        autonomous()
+        break
     elif touch_sensor.pressed():
         robot.stop()
-        ev3.screen.print("Touch Sensor Pressed!")
+        ev3.screen.print("Touch Sensor Pressed")
         break
-    time.sleep(0.1) # Add a small delay to avoid overwhelming the hub
+    time.sleep(0.1)
