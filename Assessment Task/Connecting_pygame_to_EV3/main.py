@@ -24,9 +24,11 @@ FRONT_KEY = 'w'
 BACK_KEY = 's'
 LEFT_KEY = 'a'
 RIGHT_KEY = 'd'
-STOP_KEY = 'q'
+STOP_KEY = 'm'
+AUTOMATIC_KEY = "q"
 
 turn = 1
+Manual = 1
 
 obstacle_sensor = UltrasonicSensor(Port.S4)  # Ultrasonic sensor
 color_sensor = ColorSensor(Port.S3)  # Color sensor
@@ -40,7 +42,7 @@ print("Click Q to make it Autonomous")
 ev3.speaker.beep()
 
 def checkforobstacles():
-    if obstacle_sensor.distance() < 200:
+    if obstacle_sensor.distance() < 250:
         robot.stop()
         ev3.screen.clear()
         ev3.screen.print("Object detected!")
@@ -50,7 +52,7 @@ def checkforobstacles():
         ev3.speaker.beep()
         wait(100)
         ev3.screen.clear()
-        robot.drive_time(-300, 0, 1000)
+        robot.drive_time(-250, 0, 1000)
     else:
         ev3.screen.print("No Obstacles Detected")
         wait(500)
@@ -58,57 +60,107 @@ def checkforobstacles():
 
 def autonomous():
     print("Autonomous session is active")
-    while True:
+    while Manual == 0:
         ev3.screen.clear()
         ev3.screen.print("Autonomous")
         robot.drive_time(100, 0, 1000)
-        if obstacle_sensor.distance() < 150:
+        if obstacle_sensor.distance() < 150 or color_sensor.color() == Color.BLACK:
             turn = random.randint(1, 2)
-            print(color = color_sensor.color)
             if turn == 1:
                 robot.turn(100)
-                robot.drive_time(250, 0, 2000)
+                robot.drive_time(200, 0, 2000)
                 robot.turn(100)
             if turn == 2:
                 robot.turn(-100)
-                robot.drive_time(250, 0, 2000)
+                robot.drive_time(200, 0, 2000)
                 robot.turn(-100)
+        if color_sensor.color() == Color.RED or color_sensor.color() == Color.YELLOW or color_sensor.color() == Color.BLUE:
+            robot.stop()
+            robot.turn(100)
+            robot.drive_time(100, 0, 1000)
+            robot.turn(-100)
+            robot.drive_time(100, 0, 1000)
+            robot.turn(-100)
+        if color_sensor.color() == Color.GREEN:
+            robot.turn(-100)
+            robot.turn(-100)
+            robot.turn(-100)
+            robot.turn(-100)
 
-
-while True:
+while True: 
+    print(Manual)
     char = sys.stdin.read(1)
-    if char == FRONT_KEY:
-        ev3.screen.print("Going Forawrds")
-        robot.drive_time(200, 0, 1000)
+    while Manual != 0: #change back to if
+        if char == FRONT_KEY:
+            ev3.screen.print("Going Forawrds")
+            robot.drive_time(200, 0, 1000)
+            ev3.screen.clear()
+            robot.stop()
+            checkforobstacles()
+            char = " "
+        elif char == BACK_KEY:
+            ev3.screen.print("Going Backwards")
+            robot.drive_time(-200, 0, 1000)
+            ev3.screen.clear()
+            robot.stop()
+            checkforobstacles()
+            char = " "
+        elif char == LEFT_KEY:
+            ev3.screen.print("Turning Left")
+            robot.turn(-50)
+            ev3.screen.clear()
+            robot.stop()
+            checkforobstacles()
+            char = " "
+        elif char == RIGHT_KEY:
+            ev3.screen.print("Turning Right")
+            robot.turn(50)
+            ev3.screen.clear()
+            robot.stop()
+            checkforobstacles()
+            char = " "
+        elif char == AUTOMATIC_KEY:
+            robot.stop()
+            ev3.screen.print("Loading Autonomous Mode. . .")
+            print("Loading Autonomous Mode. . .")
+            #add autonomous mode here if it doesnt work
+            Manual = 0
+            print("Autonomatic")
+        elif touch_sensor.pressed():
+            robot.stop()
+            ev3.screen.print("Touch Sensor Pressed")
+            break
+        time.sleep(0.1)
+    while Manual != 1:
+        char = " "
         ev3.screen.clear()
-        robot.stop()
-        checkforobstacles()
-    elif char == BACK_KEY:
-        ev3.screen.print("Going Backwards")
-        robot.drive_time(-200, 0, 1000)
-        ev3.screen.clear()
-        robot.stop()
-        checkforobstacles()
-    elif char == LEFT_KEY:
-        ev3.screen.print("Turning Left")
-        robot.turn(-50)
-        ev3.screen.clear()
-        robot.stop()
-        checkforobstacles()
-    elif char == RIGHT_KEY:
-        ev3.screen.print("Turning Right")
-        robot.turn(50)
-        ev3.screen.clear()
-        robot.stop()
-        checkforobstacles()
-    elif char == STOP_KEY:
-        robot.stop()
-        ev3.screen.print("Loading . . .")
-        print("Loading . . .")
-        autonomous()
-        break
-    elif touch_sensor.pressed():
-        robot.stop()
-        ev3.screen.print("Touch Sensor Pressed")
-        break
-    time.sleep(0.1)
+        ev3.screen.print("Autonomous")
+        robot.drive_time(100, 0, 1000)
+        if obstacle_sensor.distance() < 150 or color_sensor.color() == Color.BLACK:
+            turn = random.randint(1, 2)
+            if turn == 1:
+                robot.turn(100)
+                robot.drive_time(200, 0, 2000)
+                robot.turn(100)
+            if turn == 2:
+                robot.turn(-100)
+                robot.drive_time(200, 0, 2000)
+                robot.turn(-100)
+        if color_sensor.color() == Color.RED or color_sensor.color() == Color.YELLOW or color_sensor.color() == Color.BLUE:
+            robot.stop()
+            robot.turn(100)
+            robot.drive_time(100, 0, 1000)
+            robot.turn(-100)
+            robot.drive_time(100, 0, 1000)
+            robot.turn(-100)
+        if color_sensor.color() == Color.GREEN:
+            robot.turn(-100)
+            robot.turn(-100)
+            robot.turn(-100)
+            robot.turn(-100)
+        if char == STOP_KEY:
+            robot.stop()
+            ev3.screen.print("Loading Manual Mode . . .")
+            print("Loading Manual Mode. . .")
+            print("Manual Mode Successful")
+            Manual = 1

@@ -1,0 +1,1 @@
+Fisrtly Define what success is and then perfect it multiple times to make it 'as good as it gets'
