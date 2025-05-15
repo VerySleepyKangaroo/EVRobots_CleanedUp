@@ -1,4 +1,3 @@
-#!/usr/bin/env pybricks-micropython
 import sys
 import time
 import math
@@ -28,11 +27,11 @@ STOP_KEY = 'm'
 AUTOMATIC_KEY = "q"
 
 turn = 1
-Manual = 1
+Manual = 0
 
 obstacle_sensor = UltrasonicSensor(Port.S4)  # Ultrasonic sensor
 color_sensor = ColorSensor(Port.S3)  # Color sensor
-touch_sensor = TouchSensor(Port.S1)  # Touch sensor
+color_sensor2 = ColorSensor(Port.S1)  # Colour sensor 2
 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=118)
 
@@ -59,12 +58,19 @@ def checkforobstacles():
         ev3.screen.clear()
 
 def autonomous():
+    '''
+    This explains what the blovk and function do to other people. DocString
+    steos
+    1.
+    2.
+    3
+    '''
     print("Autonomous session is active")
     while Manual == 0:
         ev3.screen.clear()
         ev3.screen.print("Autonomous")
         robot.drive_time(100, 0, 1000)
-        if obstacle_sensor.distance() < 150 or color_sensor.color() == Color.BLACK:
+        if obstacle_sensor.distance() < 150 or color_sensor.color() == Color.BLACK: # this is what this line does
             turn = random.randint(1, 2)
             if turn == 1:
                 robot.turn(100)
@@ -87,10 +93,11 @@ def autonomous():
             robot.turn(-100)
             robot.turn(-100)
 
-while True: 
+while True:
+    wait(100)
     print(Manual)
     char = sys.stdin.read(1)
-    while Manual != 0: #change back to if
+    if Manual == 0: #change back to if
         if char == FRONT_KEY:
             ev3.screen.print("Going Forawrds")
             robot.drive_time(200, 0, 1000)
@@ -126,25 +133,21 @@ while True:
             #add autonomous mode here if it doesnt work
             Manual = 0
             print("Autonomatic")
-        elif touch_sensor.pressed():
-            robot.stop()
-            ev3.screen.print("Touch Sensor Pressed")
-            break
         time.sleep(0.1)
-    while Manual != 1:
+    if Manual == 1:
         char = " "
         ev3.screen.clear()
         ev3.screen.print("Autonomous")
         robot.drive_time(100, 0, 1000)
-        if obstacle_sensor.distance() < 150 or color_sensor.color() == Color.BLACK:
+        if color_sensor.color() == Color.BLACK:
             turn = random.randint(1, 2)
             if turn == 1:
-                robot.turn(100)
-                robot.drive_time(200, 0, 2000)
+                robot.turn(100) # I use turn 100 instead of 90 because 'turning 90 degrees' turns the robot like 75 degrees
+                robot.drive_time(100, 0, 1000)
                 robot.turn(100)
             if turn == 2:
                 robot.turn(-100)
-                robot.drive_time(200, 0, 2000)
+                robot.drive_time(100, 0, 1000)
                 robot.turn(-100)
         if color_sensor.color() == Color.RED or color_sensor.color() == Color.YELLOW or color_sensor.color() == Color.BLUE:
             robot.stop()
